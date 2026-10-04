@@ -73,6 +73,10 @@ if difference < 0:
 
     counted_again = ask_yes_no("Counted again?")
 
+    # ----------------------------------------
+    # RECOUNT
+    # ----------------------------------------
+
     if not counted_again:
         print()
         print("Count the stock again.")
@@ -87,5 +91,17 @@ if difference < 0:
         print()
         show_stock_status(difference)
 
-    if difference != 0:
-        check_open_movement()
+    # ----------------------------------------
+    # OPEN MOVEMENT CHECK
+    # ----------------------------------------
+
+    if difference < 0:
+        print()
+
+        open_movement = ask_yes_no("Open movement?")
+
+        if open_movement:
+            print("Check the movement first.")
+
+        else:
+            print("Continue to the next check.")
