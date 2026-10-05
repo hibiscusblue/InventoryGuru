@@ -12,96 +12,165 @@ def get_quantity(question):
             print("Enter a number.")
 
 
-def ask_yes_no(question):
+def get_choices(question, number_of_choices):
     while True:
-        answer = input(question + " (Y/N): ").strip().upper()
+        answer = input(question)
 
-        if answer == "Y":
-            return True
+        try:
+            choices = [int(choice.strip()) for choice in answer.split(",")]
 
-        elif answer == "N":
-            return False
+            if all(1 <= choice <= number_of_choices for choice in choices):
+                return choices
 
-        else:
-            print("Enter Y or N.")
+            print("Choose numbers from the list.")
 
-
-def calculate_difference(system_quantity, counted_quantity):
-    return counted_quantity - system_quantity
+        except ValueError:
+            print("Enter numbers separated by commas.")
 
 
-def show_stock_status(difference):
-    if difference < 0:
-        print("STOCK SHORTAGE")
-        print("Missing:", abs(difference))
+def material_workbench_check():
+    print()
+    print("STEP 1 - MATERIAL WORKBENCH")
+    print()
+    print("Check the item in Material Workbench.")
+    print()
+    print("What do you see?")
+    print()
+    print("1 - Underdelivery")
+    print("2 - Scrap")
+    print("3 - Hold")
+    print("4 - Oracle / KiSoft discrepancy")
+    print("5 - Receiving error")
+    print("6 - Everything looks correct")
+    print("7 - Other")
 
-    elif difference > 0:
-        print("STOCK OVERAGE")
-        print("Extra:", difference)
+    print()
 
-    else:
-        print("STOCK OK")
+
+    choices = get_choices("Choice(s): ", 7)
+
+    return choices
+
+
+def material_transactions_check():
+    print()
+    print("STEP 2 - MATERIAL TRANSACTIONS")
+    print()
+    print("Check Material Transactions.")
+    print()
+    print("What do you see?")
+    print()
+    print("1 - Cycle count")
+    print("2 - Picking exception")
+    print("3 - Scrap to DAR")
+    print("4 - Open PO")
+    print("5 - Nothing relevant")
+    print("6 - Other")
+
+    print()
+
+    choice = get_choices("Choice(s): ", 6)
+
+    return choices
 
 
 # ========================================
 # INVENTORYGURU - START
 # ========================================
 
+print()
 print("InventoryGuru(^_^)")
 print("Simple answers. Clear actions.")
 print()
 
-sku = input("SKU: ")
-system_quantity = get_quantity("System quantity: ")
-counted_quantity = get_quantity("Counted quantity: ")
+print("UNEXPLAINED ITEM")
+print()
 
-difference = calculate_difference(
-    system_quantity,
-    counted_quantity,
-)
+sku = input("SKU: ").strip().upper()
+quantity = get_quantity("Physical quantity: ")
 
 print()
-show_stock_status(difference)
+print("SKU:", sku)
+print("Quantity:", quantity)
 
 
 # ========================================
-# SHORTAGE WORKFLOW
+# STEP 1 - MATERIAL WORKBENCH
 # ========================================
 
-if difference < 0:
+workbench_result = material_workbench_check()
+
+
+# ========================================
+# WORKBENCH RESULTS
+# ========================================
+
+if workbench_result == 1:
     print()
+    print("UNDERDELIVERY FOUND")
+    print("Investigate the underdelivery.")
 
-    counted_again = ask_yes_no("Counted again?")
+elif workbench_result == 2:
+    print()
+    print("SCRAP FOUND")
+    print("Investigate the scrap stock.")
 
-    # ----------------------------------------
-    # RECOUNT
-    # ----------------------------------------
+elif workbench_result == 3:
+    print()
+    print("HOLD FOUND")
+    print("Investigate the hold stock.")
 
-    if not counted_again:
+elif workbench_result == 4:
+    print()
+    print("SYSTEM DISCREPANCY FOUND")
+    print("Compare Oracle and KiSoft.")
+
+elif workbench_result == 5:
+    print()
+    print("RECEIVING ERROR FOUND")
+    print("Check if the item is hanging in receiving.")
+
+elif workbench_result == 6:
+    print()
+    print("Material Workbench looks correct.")
+
+    # ========================================
+    # STEP 2 - MATERIAL TRANSACTIONS
+    # ========================================
+
+    transaction_result = material_transactions_check()
+
+    if transaction_result == 1:
         print()
-        print("Count the stock again.")
+        print("CYCLE COUNT FOUND")
+        print("Investigate the cycle count.")
 
-        counted_quantity = get_quantity("New count: ")
-
-        difference = calculate_difference(
-            system_quantity,
-            counted_quantity,
-        )
-
+    elif transaction_result == 2:
         print()
-        show_stock_status(difference)
+        print("PICKING EXCEPTION FOUND")
+        print("Investigate the picking exception.")
 
-    # ----------------------------------------
-    # OPEN MOVEMENT CHECK
-    # ----------------------------------------
-
-    if difference < 0:
+    elif transaction_result == 3:
         print()
+        print("SCRAP TO DAR FOUND")
+        print("Investigate the booking.")
 
-        open_movement = ask_yes_no("Open movement?")
+    elif transaction_result == 4:
+        print()
+        print("OPEN PO FOUND")
+        print("Investigate the open PO.")
 
-        if open_movement:
-            print("Check the movement first.")
+    elif transaction_result == 5:
+        print()
+        print("NO EXPLANATION FOUND")
+        print("Continue to the next check.")
 
-        else:
-            print("Continue to the next check.")
+    else:
+        print()
+        print("OTHER RESULT")
+        print("Ask Inventory Control.")
+
+else:
+    print()
+    print("OTHER RESULT")
+    print("Ask Inventory Control.")
